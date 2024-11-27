@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ultra-Realistic Advanced Digital Clock</title>
+    <style>
+        /* Basic Reset */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: linear-gradient(45deg, #1c1c1c, #ff3366);
+            font-family: 'Roboto', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            color: #fff;
+            margin: 0;
+        }
+
+        /* Main Clock Container */
+        .clock-container {
+            background: rgba(0, 0, 0, 0.7);
+            border-radius: 30px;
+            padding: 40px;
+            text-align: center;
+            box-shadow: 0 0 60px rgba(0, 0, 0, 0.9);
+            transition: all 0.3s ease;
+            max-width: 1000px;
+            width: 100%;
+        }
+
+        /* Digital Clock Display */
+        .clock {
+            font-size: 150px;
+            font-weight: bold;
+            color: #fff;
+            text-shadow: 0 0 10px rgba(255, 255, 255, 0.6), 0 0 20px rgba(255, 255, 255, 0.3);
+            letter-spacing: 5px;
+        }
+
+        .clock-date {
+            font-size: 25px;
+            color: #f0f0f0;
+            margin-top: 20px;
+        }
+
+        /* Customization & Settings */
+        .settings-panel {
+            display: flex;
+            justify-content: center;
+            margin-top: 30px;
+            gap: 20px;
+        }
+
+        .settings-btn, .timezone-btn {
+            background-color: #4CAF50;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 18px;
+            transition: all 0.3s ease;
+        }
+
+        .settings-btn:hover, .timezone-btn:hover {
+            background-color: #f0b27a;
+        }
+
+        /* World Map Display */
+        #world-map {
+            display: none;
+            margin-top: 30px;
+            width: 100%;
+            height: auto;
+            border-radius: 10px;
+            max-width: 600px;
+        }
+
+        /* Weather Information */
+        .weather-info {
+            margin-top: 20px;
+            font-size: 18px;
+            color: #ffdd57;
+        }
+
+        /* Popup for Settings */
+        .popup {
+            display: none;
+            background: rgba(0, 0, 0, 0.8);
+            color: #fff;
+            padding: 40px;
+            border-radius: 15px;
+            position: absolute;
+            top: 30%;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 100;
+            width: 300px;
+        }
+
+        .popup-close {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            font-size: 30px;
+            color: #fff;
+            cursor: pointer;
+        }
+
+        .popup button {
+            background-color: #F0B27A;
+            color: white;
+            padding: 10px;
+            border: none;
+            cursor: pointer;
+            border-radius: 5px;
+            width: 100%;
+        }
+
+        .popup button:hover {
+            background-color: #6C5B7B;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .clock {
+                font-size: 120px;
+            }
+
+            .settings-panel {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Main Clock Container -->
+    <div class="clock-container">
+        <div id="clock" class="clock"></div>
+        <div id="date" class="clock-date"></div>
+
+        <div class="settings-panel">
+            <button id="settingsBtn" class="settings-btn">Settings</button>
+            <button id="worldTimeBtn" class="timezone-btn">World Time</button>
+        </div>
+
+        <!-- Weather Display -->
+        <div id="weather" class="weather-info">Weather: Loading...</div>
+
+        <!-- World Map for Time Zones -->
+        <div id="world-map">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/e/e4/World_map_timezones_2019.svg/1200px-World_map_timezones_2019.svg.png" alt="World Time Zones">
+        </div>
+    </div>
+
+    <!-- Popup for Settings -->
+    <div id="settingsPopup" class="popup">
+        <span class="popup-close" onclick="closePopup()">×</span>
+        <h3>Clock Settings</h3>
+        <p>Choose a color theme:</p>
+        <button onclick="changeTheme()">Change Theme</button>
+    </div>
+
+    <script>
+        // Get current time based on timezone
+        function updateClock() {
+            const timezone = document.getElementById('citySelector') ? document.getElementById('citySelector').value : 'Asia/Dhaka';
+            const now = new Date(new Date().toLocaleString('en-US', { timeZone: timezone }));
+
+            const hours = now.getHours();
+            const minutes = now.getMinutes();
+            const seconds = now.getSeconds();
+            const date = now.toDateString();
+
+            // Format time (12-hour format with AM/PM)
+            const time = `${hours % 12 || 12}:${minutes < 10 ? '0' : ''}${minutes}:${seconds < 10 ? '0' : ''}${seconds} ${hours >= 12 ? 'PM' : 'AM'}`;
+
+            // Update the clock and date
+            document.getElementById('clock').textContent = time;
+            document.getElementById('date').textContent = date;
+        }
+
+        setInterval(updateClock, 1000); // Update every second
+        updateClock(); // Initial call to set the clock immediately
+
+        // Open world time map
+        document.getElementById('worldTimeBtn').addEventListener('click', function() {
+            document.getElementById('world-map').style.display = 'block';
+        });
+
+        // Open Settings Popup
+        document.getElementById('settingsBtn').addEventListener('click', function() {
+            document.getElementById('settingsPopup').style.display = 'block';
+        });
+
+        // Close Settings Popup
+        function closePopup() {
+            document.getElementById('settingsPopup').style.display = 'none';
+        }
+
+        // Change clock theme
+        function changeTheme() {
+            document.body.style.background = 'linear-gradient(45deg, #6C5B7B, #F0B27A)';
+        }
+
+        // Fetch Weather Data for a city (simplified version)
+        function fetchWeather() {
+            // Simulating a weather API request (use actual API for real data)
+            setTimeout(() => {
+                document.getElementById('weather').textContent = 'Weather: 27°C, Clear Sky';
+            }, 2000);
+        }
+        fetchWeather();
+
+    </script>
+
+</body>
+</html>
